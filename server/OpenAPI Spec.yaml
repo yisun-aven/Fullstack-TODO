@@ -1,0 +1,186 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: To-do API
+  description: OpenAPI spec for Yi Sun's todo list project
+  contact:
+    name: Yi Sun
+    email: yisun.aven@gmail.com
+  license:
+    name: Yi Sun License
+servers: 
+  - url: http://localhost:3000
+    description: localhost server
+  
+paths:
+  /todos: 
+    get:
+      summary: Get all to-do tasks
+      operationId: getToDo
+      description: Retrieve all to-do tasks from the database
+      responses:
+        200:
+          description: Successfully retrieved all to-do tasks
+          content: 
+            application/json: 
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Todo'
+                  
+    post: 
+      summary: Create a new to-do task
+      operationId: createToDo
+      description: Add a new to-do task to the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo' 
+      responses:
+        200:
+          description: Successfully created a to-do task
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Todo' 
+                
+    delete:
+      summary: Clear all to-do tasks
+      operationId: clearToDo
+      description: Clear all to-do tasks from the database
+      responses:
+        200:
+          description: Successfully cleared all to-do tasks
+                
+    patch:
+      summary: Sort to-do tasks by due date
+      operationId: sortDateToDo
+      description: Sort to-do taksks by the due date and if due date is not specified, put the task in the end
+      responses:
+        200:
+          description: Successfully sorted to-do tasks based on due dates
+          content: 
+            application/json: 
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Todo'
+                
+  /todos/{id}:
+    patch:
+      summary: Update a existing to-do task
+      operationId: updateToDo
+      description: Update a existing to-do task based on the task id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the to-do
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Todo' 
+      responses:
+        200:
+          description: Successfully updated a to-do task
+          content: 
+            application/json: 
+              schema:
+                $ref: '#/components/schemas/Todo'   
+  
+    delete:
+      summary: Delete a existing to-do task
+      operationId: deleteToDo
+      description: Delete a existing to-do task based on the task id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the to-do
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully deleted a to-do task
+                
+  /todos/prioritizeToDo:
+    get:
+      summary: Sort to-do tasks by priorities
+      operationId: prioritizeToDo
+      description: Sort to-do tasks by the priorities with default equals to 1. Higher number means more important. 5 is the maximum and 1 the minimum.
+      responses:
+        200:
+          description: Successfully sorted to-do tasks based on priorities
+          content: 
+            application/json: 
+              schema:
+                type: array
+                items: 
+                  $ref: '#/components/schemas/Todo' 
+                  
+  /todos/findTodo/{title}:
+    get:
+      summary: Find existing to-do tasks
+      operationId: findToDo
+      description: Find existing to-do tasks based on key words for similar task titles
+      parameters:
+        - in: path
+          name: title
+          required: true
+          description: The key words of the title of the to-dos
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully find to-dos based on the key words
+          content: 
+            application/json: 
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Todo' 
+
+components:
+  schemas:
+    Todo:
+      type: object
+      description: Consists of all components for a to-do task
+      required: 
+        - title
+        - description
+        - priority
+        - completed
+      properties:
+        title:
+          type: string
+          example: Apply for jobs 
+        
+        description:
+          type: string
+          example: Apply for at least 20 jobs
+          
+        dueDate:
+          type: string
+          example: 2023/09/06
+          
+        completed: 
+          type: boolean
+          default: false
+          example: true
+        
+        priority: 
+          type: integer
+          minimum: 1
+          maximum: 5
+          default: 1
+          example: 4
+        
+        createdAt:
+          type: string
+          example: 2023/03/24
