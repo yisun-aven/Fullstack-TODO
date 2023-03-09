@@ -4,3 +4,5 @@
 *.js
 src/**/*.js
 
+src/**/*.DS_Store
+
