@@ -1,7 +1,9 @@
-import { TodoModel } from "../models/todos";
+import Todo, { TodoModel } from "../models/todos";
 import TodoRepository from "../repository/todos";
 import { match } from 'ts-pattern';
-
+import * as D from 'fp-ts/Date'
+import { pipe } from 'fp-ts/function'
+import { Ord, contramap, fromCompare } from 'fp-ts/Ord';
 
 class TodoService {
   private repository: TodoRepository;
@@ -42,39 +44,16 @@ class TodoService {
     const todos = await this.repository.find();
 
     type Todo = {
-        dueDate?: Date;
-    }
-
-    type SortedResult =
-    | { type: 'no-date' }
-    | { type: 'a-no-date' }
-    | { type: 'b-no-date' }
-    | { type: 'sorted', result: number }
-
-    function compareTodos(a: Todo, b: Todo): SortedResult {
-      switch (true) {
-        case !a.dueDate && !b.dueDate:
-          return { type: 'no-date' };
-        case !a.dueDate:
-          return { type: 'a-no-date' };
-        case !b.dueDate:
-          return { type: 'b-no-date' };
-        default:
-          const result = a.dueDate!.getTime() - b.dueDate!.getTime();
-          return { type: 'sorted', result };
-      }
-    }
-
-    const sortedTodos = todos.sort((a, b) => {
-      const sortedResult = compareTodos(a, b);
-      return match(sortedResult.type)
-        .with('no-date', () => 0)
-        .with('a-no-date', () => 1)
-        .with('b-no-date', () => -1)
-        .with('sorted', () => a.dueDate.getTime() - b.dueDate.getTime())
-        .exhaustive();
-    });
-    
+      dueDate: Date;
+    };
+    const todosWithDueDate = todos.filter(todo => todo.dueDate !== undefined)
+    const todosWithNoDate = todos.filter(todo => todo.dueDate == undefined)
+    const ordByDuedate: Ord<Todo> = pipe(
+      D.Ord,
+      contramap((Todo) => Todo.dueDate)
+    )
+    const sortedTodosWithDueDate = todosWithDueDate.sort(ordByDuedate.compare);
+    const sortedTodos = sortedTodosWithDueDate.concat(todosWithNoDate);    
     return sortedTodos;
   }
 
