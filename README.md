@@ -1,6 +1,7 @@
 <h1 align>To-do RESTful service with OpenAPI spec.</h1>
 <h3 align>Author: </h3>
 - Yi Sun (Aven)<br>
+- USC Applied Data Science <br>
 - UCI Computer Science and Engineering <br>
 <br>
 
